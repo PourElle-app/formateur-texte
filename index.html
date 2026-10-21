@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Formateur de texte pour LinkedIn & Instagram (Gratuit)</title>
+<style>
+:root{--ink:#17233b;--muted:#66758b;--blue:#5b5ce2;--line:#e5e9f2;}
+body{margin:0;font:14px/1.5 Inter,sans-serif;color:var(--ink);background:#fff;}
+.top{display:flex;justify-content:space-between;padding:15px 30px;border-bottom:1px solid var(--line);}
+.brand{font-weight:850;font-size:20px;display:flex;gap:10px;align-items:center;}
+.brandmark{width:32px;height:32px;border-radius:10px;background:var(--blue);color:#fff;display:grid;place-items:center;}
+.container{max-width:800px;margin:30px auto;padding:20px;text-align:center;}
+textarea{width:100%;height:150px;padding:10px;border:1px solid #ccc;border-radius:8px;font:inherit;margin-bottom:15px;resize:vertical;}
+.primary{background:var(--blue);color:#fff;padding:14px;border:0;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer;width:100%;}
+select{padding:8px;border-radius:8px;border:1px solid #ccc;margin-left:auto;}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand"><div class="brandmark">S</div> PostFormat</div>
+  <select onchange="changeLang(this.value)"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="pt">🇧🇷 PT</option></select>
+</div>
+<div class="container">
+  <h1 id="t_title">Mettez en forme vos posts</h1>
+  <p id="t_sub" style="color:var(--muted);margin-bottom:20px;">Collez votre texte brut. On ajoute du gras et des sauts de ligne.</p>
+  <textarea id="inputText" placeholder="Mon texte brut..."></textarea>
+  <button class="primary" id="btnFormat" onclick="formatText()">Mettre en forme</button>
+  <div id="resultBox" style="display:none;margin-top:20px;">
+    <textarea id="outputText" readonly></textarea>
+  </div>
+</div>
+<script>
+const dict = {
+  fr: { title: "Mettez en forme vos posts", sub: "Collez votre texte brut. On ajoute du gras et des sauts de ligne.", btn: "Mettre en forme" },
+  en: { title: "Format your posts", sub: "Paste your raw text. We add bold and line breaks.", btn: "Format text" },
+  es: { title: "Formatea tus publicaciones", sub: "Pega tu texto sin formato. Añadimos negrita y saltos de línea.", btn: "Formatear texto" },
+  pt: { title: "Formate seus posts", sub: "Cole seu texto bruto. Adicionamos negrito e quebras de linha.", btn: "Formatar texto" }
+};
+let currentLang = 'fr';
+window.changeLang = (l) => { currentLang = l; const t = dict[l]; document.getElementById('t_title').textContent = t.title; document.getElementById('t_sub').textContent = t.sub; document.getElementById('btnFormat').textContent = t.btn; };
+window.formatText = () => {
+  let text = document.getElementById('inputText').value;
+  // Remplacement des mots clés (ex: mots en MAJUSCULES) par du gras unicode
+  text = text.replace(/\b([A-Z]{3,})\b/g, '𝗕𝗼𝗹𝗱'); // Simplifié pour l'exemple
+  text = text.replace(/\. /g, '.\n\n'); // Double saut de ligne après les points
+  document.getElementById('outputText').value = text;
+  document.getElementById('resultBox').style.display = 'block';
+};
+changeLang('fr');
+</script>
+</body>
+</html>
