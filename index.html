@@ -10,36 +10,57 @@ body{margin:0;font:14px/1.5 Inter,sans-serif;color:var(--ink);background:#fff;}
 .brand{font-weight:850;font-size:20px;display:flex;gap:10px;align-items:center;}
 .brandmark{width:32px;height:32px;border-radius:10px;background:var(--blue);color:#fff;display:grid;place-items:center;}
 .container{max-width:800px;margin:30px auto;padding:20px;text-align:center;}
-textarea{width:100%;height:150px;padding:10px;border:1px solid #ccc;border-radius:8px;font:inherit;margin-bottom:15px;resize:vertical;}
-.primary{background:var(--blue);color:#fff;padding:14px;border:0;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer;width:100%;}
+textarea{width:100%;height:120px;padding:15px;border:1px solid #ccc;border-radius:8px;font:inherit;font-size:15px;margin-bottom:15px;resize:vertical;line-height:1.6;}
+.toolbar{display:flex;gap:10px;margin-bottom:10px;justify-content:flex-start;}
+.tool-btn{background:#f0f3ff;color:var(--blue);border:1px solid #d0d4f5;padding:8px 15px;border-radius:8px;cursor:pointer;font-weight:bold;transition:0.2s;}
+.tool-btn:hover{background:var(--blue);color:#fff;}
+.primary{background:var(--blue);color:#fff;padding:14px;border:0;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer;width:100%;margin-top:10px;}
 select{padding:8px;border-radius:8px;border:1px solid #ccc;margin-left:auto;}
 </style>
 </head>
 <body>
 <div class="top">
   <div class="brand"><div class="brandmark">S</div> PostFormat</div>
-  <select onchange="changeLang(this.value)"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="pt">🇧🇷 PT</option></select>
+  <select id="langSelector" onchange="changeLang(this.value)"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="pt">🇧🇷 PT</option></select>
 </div>
 <div class="container">
   <h1 id="t_title">Mettez en forme vos posts</h1>
-  <p id="t_sub" style="color:var(--muted);margin-bottom:20px;">Entourez vos mots de ** pour les mettre en gras, et de * pour l'italique.</p>
-  <textarea id="inputText" placeholder="Je suis **très heureux** de vous annoncer..."></textarea>
-  <button class="primary" id="btnFormat" onclick="formatText()">Mettre en forme</button>
-  <div id="resultBox" style="display:none;margin-top:20px;">
-    <textarea id="outputText" readonly></textarea>
+  <p id="t_sub" style="color:var(--muted);margin-bottom:20px;">Écrivez votre texte, sélectionnez-le, et cliquez sur Gras.</p>
+  
+  <div style="text-align:left;">
+    <div class="toolbar">
+      <button class="tool-btn" onclick="applyBold()">Gras</button>
+      <button class="tool-btn" onclick="applyItalic()">Italique</button>
+    </div>
+    <textarea id="inputText" placeholder="Je suis très heureux de vous annoncer..."></textarea>
+  </div>
+  
+  <button class="primary" id="btnFormat" onclick="formatAndCopy()">Générer le texte formaté</button>
+  
+  <div id="resultBox" style="display:none;margin-top:20px;text-align:left;">
+    <label style="font-weight:bold;font-size:13px;color:var(--muted);">Voici votre texte prêt à copier-coller :</label>
+    <textarea id="outputText" readonly style="background:#f8fafc;height:120px;margin-top:5px;"></textarea>
   </div>
 </div>
 <script>
 const dict = {
-  fr: { title: "Mettez en forme vos posts", sub: "Entourez vos mots de ** pour les mettre en gras, et de * pour l'italique.", btn: "Mettre en forme" },
-  en: { title: "Format your posts", sub: "Wrap your words with ** for bold, and * for italic.", btn: "Format text" },
-  es: { title: "Formatea tus publicaciones", sub: "Envuelve tus palabras con ** para negrita, y * para cursiva.", btn: "Formatear texto" },
-  pt: { title: "Formate seus posts", sub: "Envolva suas palavras com ** para negrito, e * para itálico.", btn: "Formatar texto" }
+  fr: { title: "Mettez en forme vos posts", sub: "Écrivez votre texte, sélectionnez-le, et cliquez sur Gras.", btn: "Générer le texte formaté", bold: "Gras", italic: "Italique", placeholder: "Je suis très heureux de vous annoncer..." },
+  en: { title: "Format your posts", sub: "Type your text, select it, and click Bold.", btn: "Generate formatted text", bold: "Bold", italic: "Italic", placeholder: "I am very happy to announce..." },
+  es: { title: "Formatea tus publicaciones", sub: "Escribe tu texto, selecciónalo y haz clic en Negrita.", btn: "Generar texto formateado", bold: "Negrita", italic: "Cursiva", placeholder: "Estoy muy feliz de anunciar..." },
+  pt: { title: "Formate seus posts", sub: "Escreva seu texto, selecione-o e clique em Negrito.", btn: "Gerar texto formatado", bold: "Negrito", italic: "Itálico", placeholder: "Estou muito feliz em anunciar..." }
 };
 let currentLang = 'fr';
-window.changeLang = (l) => { currentLang = l; const t = dict[l]; document.getElementById('t_title').textContent = t.title; document.getElementById('t_sub').textContent = t.sub; document.getElementById('btnFormat').textContent = t.btn; };
+window.changeLang = (l) => { 
+  currentLang = l; const t = dict[l]; 
+  document.getElementById('t_title').textContent = t.title; 
+  document.getElementById('t_sub').textContent = t.sub; 
+  document.getElementById('btnFormat').textContent = t.btn;
+  document.querySelector('.toolbar').children[0].textContent = t.bold;
+  document.querySelector('.toolbar').children[1].textContent = t.italic;
+  document.getElementById('inputText').placeholder = t.placeholder;
+};
 
-// --- FONCTION MAGIQUE : Conversion en caractères Unicode ---
+// Fonction pour convertir en caractères Unicode (Gras)
 function toBold(text) {
   const boldMap = {
     'a': '𝗮', 'b': '𝗯', 'c': '𝗰', 'd': '𝗱', 'e': '𝗲', 'f': '𝗳', 'g': '𝗴', 'h': '𝗵', 'i': '𝗶', 'j': '𝗷', 'k': '𝗸', 'l': '𝗹', 'm': '𝗺',
@@ -51,6 +72,7 @@ function toBold(text) {
   return text.split('').map(c => boldMap[c] || c).join('');
 }
 
+// Fonction pour convertir en caractères Unicode (Italique)
 function toItalic(text) {
   const italicMap = {
     'a': '𝘢', 'b': '𝘣', 'c': '𝘤', 'd': '𝘥', 'e': '𝘦', 'f': '𝘧', 'g': '𝘨', 'h': '𝘩', 'i': '𝘪', 'j': '𝘫', 'k': '𝘬', 'l': '𝘭', 'm': '𝘮',
@@ -61,20 +83,47 @@ function toItalic(text) {
   return text.split('').map(c => italicMap[c] || c).join('');
 }
 
-window.formatText = () => {
+// Appliquer le gras sur la sélection
+window.applyBold = () => {
+  const textarea = document.getElementById('inputText');
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  if (start === end) return alert("Sélectionnez d'abord le texte à mettre en gras.");
+  
+  const selected = textarea.value.substring(start, end);
+  const bolded = toBold(selected);
+  textarea.value = textarea.value.substring(0, start) + bolded + textarea.value.substring(end);
+  textarea.focus();
+  textarea.setSelectionRange(start, end);
+};
+
+// Appliquer l'italique sur la sélection
+window.applyItalic = () => {
+  const textarea = document.getElementById('inputText');
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  if (start === end) return alert("Sélectionnez d'abord le texte à mettre en italique.");
+  
+  const selected = textarea.value.substring(start, end);
+  const italicized = toItalic(selected);
+  textarea.value = textarea.value.substring(0, start) + italicized + textarea.value.substring(end);
+  textarea.focus();
+  textarea.setSelectionRange(start, end);
+};
+
+// Générer et copier le résultat final
+window.formatAndCopy = () => {
   let text = document.getElementById('inputText').value;
-  
-  // 1. Remplacer le gras (**texte**)
-  text = text.replace(/\*\*(.*?)\*\*/g, (match, p1) => toBold(p1));
-  
-  // 2. Remplacer l'italique (*texte*)
-  text = text.replace(/\*(.*?)\*/g, (match, p1) => toItalic(p1));
-  
-  // 3. Ajouter des sauts de ligne après les points (pour aérer le texte)
+  // Ajouter des sauts de ligne après les points pour aérer
   text = text.replace(/\. /g, '.\n\n');
   
   document.getElementById('outputText').value = text;
   document.getElementById('resultBox').style.display = 'block';
+  
+  // Copie automatique dans le presse-papier
+  document.getElementById('outputText').select();
+  document.execCommand('copy');
+  alert("Texte formaté et copié dans le presse-papier !");
 };
 changeLang('fr');
 </script>
